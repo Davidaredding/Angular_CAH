@@ -71,11 +71,6 @@ app.controller("GameController", ['$scope','$http','$filter', '$timeout',functio
 		s.AnswerCards = [];
 	}
 
-	s.cardMarginFromIndex = function(index)
-	{
-		return ""+index * 100+"px";
-	}
-
 	$http.get('node_modules/cah-cards/cards.json')
 		.success(function(data)
 		{

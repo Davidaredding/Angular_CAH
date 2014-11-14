@@ -17,7 +17,7 @@
 				</span>
 			</div>
 			<div class="answers">
-				<div class="answer card" ng-repeat="answer in AnswerCards" ng-style="{'top':cardMarginFromIndex($index)}">
+				<div class="answer card" ng-repeat="answer in AnswerCards" ng-style="{'top':(100*$index)+'px'}">
 					<span class="text" data-ng-bind="answer.text">
 					</span>
 				</div>
