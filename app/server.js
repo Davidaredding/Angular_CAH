@@ -1,6 +1,9 @@
 var express = require('express'); // load express
 var app 	= express();		  // get an instance of express
+var http 	= require('http').Server(app);
 var bodyParser = require('body-parser'); //load body parser for json data parsing
+
+var io 		= require("socket.io")(http);
 var port = process.env.PORT || 8080; // Set the server port;
 
 app.use(bodyParser.urlencoded({extended:true}));
@@ -21,11 +24,23 @@ app_router.use(function(req,res,next){
 	next();
 });
 
-var api_controller = require('./APIController.js')(api_router);
+var api_controller = require('./APIController.js')(api_router,io);
 //var app_controller = require('./AppController.js')(app_router);
 
 app.use('/api',api_router); //all routes that begin with /api
 //app.use('/',app_router);
 
-app.listen(port); //starts the router
-console.log('Server running on port: ' + port);
+
+/*io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('TestMessage',function(msg){
+  	io.emit('TestMessage', "A Message: " + msg);
+  });
+});*/
+
+
+
+
+http.listen(port,function(){
+	console.log('Server running on port: ' + port);	
+}); //starts the router

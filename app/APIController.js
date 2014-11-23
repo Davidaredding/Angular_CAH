@@ -20,35 +20,35 @@ function shuffle(a){
 	}
 
 
-module.exports = function(router){
+module.exports = function(router, io){
 	//Games = []
 	game = null;
 	router.route('/Game')
 		.get(function(req,res) //Gets the current game
 		{
-			if(!game)
-				res.status(404).send("Could not find an active game");
-			else
-				res.json(game.ToSimple());
+			StartCycle();
+			res.json(game.ToSimple());	
 		})
-		.post(function(req,res) //Creates the current game
-		{
-			Create_Game()
-			.then(function(){
-				res.status(200).send("Game Succesfully Created");
-			});
-		});
-	router.route('/Game/DrawAnswerCards/:count')
-		.get(function(req,res){
-			res.json(Draw_AnswerCards(req.params.count));
-		});
-	router.route('/Game/DrawQuestionCard')
-		.get(function(req,res){
-			Draw_Question();
-			res.json(game.currentQuestion)
-		});
 		
 
+	function StartCycle()
+	{
+		if(game)
+			return;	
+		
+		Create_Game()
+		.then(function(){
+			cycle();
+		});
+	
+	}
+
+	function cycle()
+	{
+		Draw_Question();
+		Draw_AnswerCards(game.currentQuestion.numAnswers);
+		setTimeout(cycle,3000);
+	}
 
 	function Create_Game()
 	{
@@ -57,7 +57,6 @@ module.exports = function(router){
 
 	function Draw_Question()
 	{
-
 		if(!game)
 			return null;
 
@@ -76,10 +75,12 @@ module.exports = function(router){
 		var question = game.questions.pop();
 	
 		game.currentQuestion =  question;
+		io.emit('NewQuestion', question);
 	}
 
 	function Draw_AnswerCards(count)
 	{
+
 		if(!game)
 			return null;
 		count = count<=0?1:count;
@@ -103,12 +104,15 @@ module.exports = function(router){
 			retval.push(card);
 			game.currentAnswers.push(card);
 		};
+		io.emit("Answers", retval);
 		return retval;
 	}
 
 	/*  Helper Methods */ 
 	function CreateNewGame()
 	{
+		if(game)
+			return;
 		game = new gameModel({active:true});
 		return db.FetchQuestions()
 		.then(function(cards){
