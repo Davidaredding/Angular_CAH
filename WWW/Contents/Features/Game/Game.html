@@ -1,0 +1,16 @@
+
+
+<div id="content" class="mainApp">
+	<div class="question card">
+		<span data-ng-bind="QuestionCard.text | stringReplaceFilter:'_':'__________'" class="text"></span>
+		<span class="pick">
+			Pick <div class="text" data-ng-bind="QuestionCard.numAnswers" ></div>
+		</span>
+	</div>
+	<div class="answers">
+		<div class="answer card" ng-repeat="answer in Answers" ng-style="{'top':(100*$index)+'px'}">
+			<span class="text" data-ng-bind="answer.text">
+			</span>
+		</div>
+	</div>
+</div>
